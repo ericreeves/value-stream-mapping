@@ -1,0 +1,60 @@
+%%{init: {'theme': 'dark' } }%%
+sequenceDiagram
+    participant AppTeam as App Team
+    participant ReviewBoard as Review Board
+    participant PlatformTeam as Platform Team
+    participant IamTeam as IAM Team
+    participant Security as Security Team
+    participant ComputeStorage as Compute/Storage Team
+    participant DBATeam as DBA Team
+    %% AWS Account
+    rect rgb(50, 50, 60)
+    Note left of AppTeam: Step 1: AWS Account Provisioning<br>Total Time: 2 Weeks
+    AppTeam->>ReviewBoard: SNOW Demand for AWS Account
+    Note over ReviewBoard: Several Days to Several Weeks
+    ReviewBoard->>PlatformTeam: SNOW Request for AWS Account
+    Note over PlatformTeam: 1 Hour
+    PlatformTeam->>IamTeam: IAM Access Request
+    Note over IamTeam: 1 Hour (???)
+    IamTeam->>AppTeam: AWS Account Access Granted
+    AppTeam->>IamTeam: AD Group Access Request
+    Note over IamTeam: 1-2 Days
+    IamTeam->>AppTeam: AD Group Access Granted
+    end
+    %% App Registration in Snow
+    rect rgb(50, 50, 60)
+    Note left of AppTeam: Step 2a: App Config Item  in SNOW<br>Total Time: 5 Days
+    AppTeam->>ComputeStorage: Submit "New Application Configuration Item (CI) Request"
+    Note over ComputeStorage: SLA 5 Days
+    ComputeStorage->>AppTeam: Application Configuration Item Created
+    Note left of AppTeam: Step 2b: App Registration in SNOW<br>Total Time: 2-5 Days
+    AppTeam->>ComputeStorage: Submit "New Application Registration Request"
+    Note over ComputeStorage: SLA 2 Days
+    ComputeStorage->>IamTeam: Request OU with GPO and Security Group
+    Note over IamTeam: SLA ??? Days
+    IamTeam->>AppTeam: Application Registration Created
+ end
+    %% EC2 Instance
+    rect rgb(50, 50, 60)
+    Note left of AppTeam: Step 4: EC2 Instance Provisioning<br>Total Time: 30 Days
+
+    AppTeam->>ComputeStorage: SNOW EC2 Instance(s) Request
+    Note over ComputeStorage: SLA 30 Days
+    ComputeStorage->>AppTeam: EC2 Instance(s) Provisioned
+    ComputeStorage->>IamTeam: 
+    ComputeStorage->>Security: VM Security Setup
+    Security->>AppTeam: Access to VMs
+    end
+    AppTeam->>ComputeStorage: Firewall & Security Group Modifications
+    AppTeam->>DBATeam: Database Request
+    DBATeam-->>AppTeam: DB Provisioned
+    AppTeam->>Security: IAM User Request
+    Security-->>AppTeam: Credentials in Delinea Secrets Server
+    AppTeam->>Security: DNS Requests
+    Security->>AppTeam: DNS Implemented
+    AppTeam->>ComputeStorage: Cloud File Storage Request
+    ComputeStorage-->>AppTeam: Storage Provisioned
+    AppTeam->>Security: SSL Certificates Request
+    Security-->>AppTeam: Certs in AWS Secrets Manager
+    AppTeam->>+AppTeam: Log into Server
+    deactivate AppTeam
